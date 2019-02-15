@@ -33,9 +33,12 @@ public class RabbitProducer {
         //创建一个持久化、非排他的、非自动删除的队列
         channel.queueDeclare(QUEUE_NAME, true, false, false, null);
         //将交换器与队列通过路由键绑定
+        //这里本该使用BindingKey，但是使用了ROUTING_KEY，就是说交换器类型为dircet时，
+        //ROUTING_KEY和BindingKey是同一个东西，要完全匹配，在topic交换器类型下，两者是模糊匹配
+        //大多数情况下习惯性地将 BindingKey 写成 RoutingKey
         channel.queueBind(QUEUE_NAME, EXCHANGE_NAME, ROUTING_KEY);
-        //发送一条持久化的消息
         String message = "Hello World!";
+        //发送消息
         channel.basicPublish(EXCHANGE_NAME, ROUTING_KEY,
                 MessageProperties.PERSISTENT_TEXT_PLAIN,
                 message.getBytes());
