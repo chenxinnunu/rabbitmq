@@ -43,6 +43,7 @@ public class RabbitConsumer {
                 channel.basicAck(envelope.getDeliveryTag(), false);
             }
         };
+        //这里是推（push）模式消费，拉（pull）模式消费调用Basic.Get
         channel.basicConsume(QUEUE_NAME, consumer);
         //等待回调函数执行完毕之后，关闭资源
         TimeUnit.SECONDS.sleep(5);
