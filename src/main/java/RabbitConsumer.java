@@ -28,6 +28,7 @@ public class RabbitConsumer {
         final Channel channel = connection.createChannel();
         //设置客户端最多接收未被ack（确认）的消息个数
         channel.basicQos(64);
+        //接收消息一般通过实现Consumer接口或者继承DefaultConsumer类实现
         Consumer consumer = new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag,
@@ -40,10 +41,12 @@ public class RabbitConsumer {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                //显式的确认消息已被成功接收，false表示不自动确认
                 channel.basicAck(envelope.getDeliveryTag(), false);
             }
         };
-        //这里是推（push）模式消费，拉（pull）模式消费调用Basic.Get
+        //这里是推（push）模式消费，推模式会不断的收到RabbitMQ的推送消息，直到取消队列订阅或者受到basicQos的限制
+        // 拉（pull）模式消费调用Basic.Get,拉模式单条额获取消息，
         channel.basicConsume(QUEUE_NAME, consumer);
         //等待回调函数执行完毕之后，关闭资源
         TimeUnit.SECONDS.sleep(5);
